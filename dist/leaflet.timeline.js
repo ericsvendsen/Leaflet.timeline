@@ -79,6 +79,7 @@ http://leafletjs.com
   L.Timeline = L.GeoJSON.extend({
     includes: L.Mixin.Events,
     times: [],
+    direction: 'forward',
     displayedLayers: [],
     ranges: null,
     options: {
@@ -95,6 +96,7 @@ http://leafletjs.com
     },
     initialize: function(timedGeoJSON, options) {
       this.times = [];
+      this.direction = 'forward';
       L.GeoJSON.prototype.initialize.call(this, void 0, options);
       L.extend(this.options, options);
       this.ranges = new IntervalTree();
@@ -201,6 +203,10 @@ http://leafletjs.com
           return displayedLayer.layer !== layer;
         });
       }
+    },
+    setDirection: function (direction) {
+      this.direction = direction;
+      return this.fire('change');
     },
     setTime: function(time) {
       this.time = (new Date(time)).getTime();
@@ -437,6 +443,7 @@ http://leafletjs.com
     _sliderChanged: function(e) {
       var time;
       time = +e.target.value;
+      this.timeline.setDirection(time < this.timeline.time ? 'backward' : 'forward');
       if (!this.timeline.options.waitToUpdateMap || e.type === 'change') {
         this.timeline.setTime(time);
       }
